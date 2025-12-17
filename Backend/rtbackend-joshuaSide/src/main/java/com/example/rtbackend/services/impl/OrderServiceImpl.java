@@ -36,8 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private final MenuItemRepo menuItemRepo;
     private final OrderItemRepo orderItemRepo;
 
-    private static final String WAITER_ROLE = "Waiter";
-    private static final String CHEF_ROLE = "Chef";
+    private static final String WAITER_ROLE = "WAITER";
+    private static final String CHEF_ROLE = "CHEF";
 
     @Override
     @Transactional
@@ -114,6 +114,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    public Order markOrderAsCooking(Long orderId, Long cashierId) {
+        // Get order
+        Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new NoSuchElementException("Order not found with id: " + orderId));
+        
+        // Check if order is in Pending status
+        if (!"Pending".equals(order.getStatus())) {
+            throw new IllegalStateException("Order must be in Pending status. Current status: " + order.getStatus());
+        }
+        
+        // Update order status to Preparing
+        order.setStatus("Preparing");
+        return orderRepo.save(order);
+    }
+
+    @Override
+    @Transactional
     public Order markOrderAsReady(Long orderId, Long chefId) {
         // Validate chef
         validateChef(chefId);
@@ -137,6 +154,23 @@ public class OrderServiceImpl implements OrderService {
         
         // Update order status to Ready
         order.setStatus("Ready");
+        return orderRepo.save(order);
+    }
+
+    @Override
+    @Transactional
+    public Order markOrderAsServed(Long orderId, Long waiterId) {
+        // Get order
+        Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new NoSuchElementException("Order not found with id: " + orderId));
+        
+        // Check if order is in Ready status
+        if (!"Ready".equals(order.getStatus())) {
+            throw new IllegalStateException("Order must be in Ready status. Current status: " + order.getStatus());
+        }
+        
+        // Update order status to Served
+        order.setStatus("Served");
         return orderRepo.save(order);
     }
 

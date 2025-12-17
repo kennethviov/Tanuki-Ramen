@@ -53,6 +53,24 @@ public class OrderController {
         }
     }
 
+    @PutMapping("/{orderId}/coopking")
+    public ResponseEntity<?> markOrderAsPreparing(
+            @PathVariable Long orderId,
+            @RequestBody Map<String, Long> request) {
+        try {
+            Long chefId = request.get("chefId");
+            Order order = orderService.markOrderAsCooking(orderId, chefId);
+            return ResponseEntity.ok(order);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "An error occurred: " + e.getMessage()));
+        }
+    }
+
     @PutMapping("/{orderId}/ready")
     public ResponseEntity<?> markOrderAsReady(
             @PathVariable Long orderId,
@@ -63,6 +81,23 @@ public class OrderController {
             return ResponseEntity.ok(order);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "An error occurred: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{orderId}/served")
+    public ResponseEntity<?> markOrderAsServed(
+        @PathVariable Long orderId,
+        @RequestBody Map<String, Long> request
+    ) {
+        try {
+            Long waiterId = request.get("waiterId");
+            Order order = orderService.markOrderAsServed(orderId, waiterId);
+            return ResponseEntity.ok(order);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {

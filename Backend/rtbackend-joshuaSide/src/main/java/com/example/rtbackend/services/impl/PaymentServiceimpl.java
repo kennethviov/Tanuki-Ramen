@@ -28,7 +28,7 @@ public class PaymentServiceimpl implements PaymentService {
     private final UserService userService;
     private final RoleService roleService;
 
-    private static final String CASHIER_ROLE = "Cashier";
+    private static final String CASHIER_ROLE = "CASHIER";
 
     @Override
     @Transactional
