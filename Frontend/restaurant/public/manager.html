@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Menu Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(196, 30, 30, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-icon {
+            font-size: 80px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff0000, #8B0000, #ff4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+            font-weight: bold;
+            letter-spacing: 2px;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255, 0, 0, 0.8)); }
+        }
+
+        .user-info-panel {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .user-info-panel h3 {
+            color: #ff4444;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .user-info-panel p {
+            color: #b0b0b0;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .user-info-panel strong {
+            color: #ff6b6b;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #c41e1e, #ff4444);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.4);
+            width: 100%;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 0, 0, 0.6);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid rgba(139, 0, 0, 0.3);
+            padding-bottom: 15px;
+        }
+
+        .nav-tab {
+            color: #888;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: #ff4444;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -17px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ff0000, #8B0000);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+        }
+
+        .nav-tab:hover {
+            color: #ff6b6b;
+        }
+
+        /* Dashboard Section */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 35px rgba(255, 0, 0, 0.5);
+            border-color: #ff0000;
+        }
+
+        .stat-card h3 {
+            color: #888;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            color: #ff4444;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #e0e0e0;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Transactions Section */
+        .section-title {
+            color: #ff4444;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 40px 0 20px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff0000, #8B0000);
+        }
+
+        .transactions-table {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background: rgba(26, 26, 26, 0.9);
+            padding: 20px;
+            color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85em;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 20px;
+            border-top: 1px solid rgba(139, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(139, 0, 0, 0.1);
+        }
+
+        .table-cell {
+            color: #e0e0e0;
+        }
+
+        /* Orders Section */
+        .order-filters {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(42, 42, 42, 0.8);
+            color: #888;
+            padding: 12px 30px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #ff0000;
+            color: #ff6b6b;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #8B0000, #c41e1e);
+            color: white;
+            border-color: #ff0000;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .order-card {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 35px rgba(255, 0, 0, 0.5);
+            border-color: #ff0000;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .order-id {
+            color: #e0e0e0;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .order-status {
+            color: #ff4444;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        .order-items {
+            color: #b0b0b0;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .order-total {
+            color: #ff4444;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* Menu Section */
+        .menu-form-container {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .image-upload-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px dashed rgba(139, 0, 0, 0.5);
+            border-radius: 15px;
+            min-height: 400px;
+            color: #888;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .form-fields {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(26, 26, 26, 0.8);
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #c41e1e, #ff4444);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.4);
+            margin-top: 10px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 0, 0, 0.6);
+        }
+
+        .menu-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(139, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 35px rgba(255, 0, 0, 0.5);
+            border-color: #ff0000;
+        }
+
+        .menu-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .menu-content {
+            padding: 20px;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .menu-name {
+            color: #ff4444;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .menu-price {
+            color: #ff4444;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .menu-info {
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .menu-info strong {
+            color: #ff6b6b;
+        }
+
+        .menu-description {
+            color: #e0e0e0;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .menu-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #c41e1e, #ff4444);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #8B0000, #c41e1e);
+        }
+
+        /* Hide sections by default */
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .menu-form-container {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-container">
+            <div class="logo-header">
+                <div class="logo-icon">🍜</div>
+                <h1>Restaurant Menu<br>Control Panel</h1>
+            </div>
+            
+            <div class="user-info-panel">
+                <h3>👤 User Info</h3>
+                <p><strong>Name:</strong> Kenneth</p>
+                <p><strong>Role:</strong> MANAGER</p>
+                <button class="logout-btn">🚪 LOGOUT</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-view="dashboard">Dashboard</div>
+            <div class="nav-tab" data-view="orders">Orders</div>
+            <div class="nav-tab" data-view="menu">Menu</div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard" class="view-section active">
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Today's Revenue</h3>
+                    <div class="stat-value">₱123.45</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Orders Today</h3>
+                    <div class="stat-value">25</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Top Menu Product</h3>
+                    <div class="stat-label">Tonkotsu<br>Ramen</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Transactions</h2>
+            <div class="transactions-table">
+                <div class="table-header">
+                    <div>Transaction ID</div>
+                    <div>Order ID</div>
+                    <div>Transaction Amount</div>
+                </div>
+                <div class="table-row">
+                    <div class="table-cell">#177</div>
+                    <div class="table-cell">#177</div>
+                    <div class="table-cell">₱123.45</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders View -->
+        <div id="orders" class="view-section">
+            <div class="order-filters">
+                <button class="filter-btn">All</button>
+                <button class="filter-btn active">Pending</button>
+                <button class="filter-btn">Preparing</button>
+                <button class="filter-btn">Ready</button>
+                <button class="filter-btn">Served</button>
+            </div>
+
+            <div class="orders-grid">
+
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">#orderId</div>
+                        <div class="order-status">Pending</div>
+                    </div>
+                    <div class="order-items">
+                    </div>
+                    <div class="order-total">₱123.45</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Menu View -->
+        <div id="menu" class="view-section">
+            <div class="menu-form-container">
+                <div class="image-upload-area">
+                    <div>
+                        <div style="font-size: 3em; margin-bottom: 20px;">📷</div>
+                        <div>Placeholder Picture</div>
+                    </div>
+                </div>
+
+                <div class="form-fields">
+                    <label for="food-name">Food Name *</label>
+                    <input id="food-name" type="text" placeholder="e.g., Spicy Tonkotsu Ramen">
+
+                    <label for="price">Price *</label>
+                    <input id="price" type="number" step="0.01" placeholder="e.g., 79.00">
+
+                    <label for="stock">Stock *</label>
+                    <input id="stock" type="number" placeholder="e.g., 50">
+
+                    <label for="category">Category *</label>
+                    <select id="category">
+                        <option value="">-- select category --</option>
+                        <option value="main">Main Course</option>
+                        <option value="side">Side Dish</option>
+                        <option value="appetizer">Appetizer</option>
+                        <option value="dessert">Dessert</option>
+                        <option value="beverage">Beverage</option>
+                    </select>
+
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3" placeholder="Rich pork broth, marinated egg..."></textarea>
+
+                    <button class="add-btn">Add Item</button>
+                </div>
+            </div>
+
+            <h2 class="section-title">Menu</h2>
+            
+            <div class="menu-filters">
+                <button class="filter-btn">All</button>
+                <button class="filter-btn active">Main Course</button>
+                <button class="filter-btn">Side Dish</button>
+                <button class="filter-btn">Appetizer</button>
+                <button class="filter-btn">Dessert</button>
+                <button class="filter-btn">Beverage</button>
+            </div>
+
+            <div class="menu-grid">
+
+                <div class="menu-card">
+                    <img class="menu-image" src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800" alt="Ramen">
+                    <div class="menu-content">
+                        <div class="menu-header">
+                            <div class="menu-name">Food Name</div>
+                            <div class="menu-price">Price</div>
+                        </div>
+                        <div class="menu-info"><strong>Category:</strong> category</div>
+                        <div class="menu-info"><strong>Stock:</strong> stock</div>
+                        <div class="menu-description">Lorem ipsum</div>
+                        <div class="menu-actions">
+                            <button class="action-btn delete-btn">Delete</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== NEW MANAGER JAVASCRIPT CODE ====================
+
+        // Configuration
+        let API_BASE_URL = null;
+        let MANAGER_ID = null;
+
+        // State Management
+        let currentView = 'dashboard';
+        let currentOrderFilter = 'Pending';
+        let currentMenuFilter = 'All';
+        let menuItems = [];
+        let orders = [];
+        let payments = [];
+        let editingMenuItem = null;
+        let selectedImageFile = null;
+
+        // Get backend URL based on environment
+        function getBaseURL() {
+            // Check if Android injected the URL
+            if (window.BACKEND_URL) {
+                return window.BACKEND_URL;
+            }
+            
+            // Fallback for browser testing
+            return 'http://localhost:8080';
+        }
+
+        // Check authentication and role
+        function checkAuth() {
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!currentUser) {
+                // Not logged in - redirect to login
+                window.location.href = 'LoginPage.html';
+                return false;
+            }
+
+            const user = JSON.parse(currentUser);
+            
+            // Update user info display (if you have these elements)
+            const userNameEl = document.getElementById('user-name');
+            const userRoleEl = document.getElementById('user-role');
+            if (userNameEl) userNameEl.textContent = user.name || user.username;
+            if (userRoleEl) userRoleEl.textContent = user.role;
+            
+            // Check if user is a manager
+            if (user.role !== 'MANAGER') {
+                // Not a manager - show access denied or redirect
+                alert('Access denied. Manager role required.');
+                window.location.href = 'LoginPage.html';
+                return false;
+            }
+
+            MANAGER_ID = user.userId;
+            return true;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set API base URL
+            API_BASE_URL = getBaseURL();
+            
+            // Check authentication first
+            if (!checkAuth()) {
+                return;
+            }
+            
+            initializeNavigation();
+            initializeOrderFilters();
+            initializeMenuFilters();
+            initializeMenuForm();
+            initializeLogout();
+            loadDashboardData();
+            loadOrders();
+            loadMenuItems();
+        });
+
+        // ==================== NAVIGATION ====================
+        function initializeNavigation() {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const view = tab.getAttribute('data-view');
+                    switchView(view);
+                    
+                    // Update active tab
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+        }
+
+        function switchView(view) {
+            currentView = view;
+            
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected view
+            document.getElementById(view).classList.add('active');
+            
+            // Refresh data for the view
+            if (view === 'dashboard') {
+                loadDashboardData();
+            } else if (view === 'orders') {
+                loadOrders();
+            } else if (view === 'menu') {
+                loadMenuItems();
+            }
+        }
+
+        // ==================== DASHBOARD ====================
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadPayments(),
+                    loadOrders()
+                ]);
+                
+                updateDashboardStats();
+                renderTransactions();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showNotification('Failed to load dashboard data', 'error');
+            }
+        }
+
+        function updateDashboardStats() {
+            const today = new Date().toDateString();
+            
+            // Calculate today's revenue
+            const todayPayments = payments.filter(p => {
+                const paymentDate = new Date(p.createdAt).toDateString();
+                return paymentDate === today && p.paymentStatus === 'Paid';
+            });
+            const todayRevenue = todayPayments.reduce((sum, p) => sum + p.amount, 0);
+            
+            // Calculate today's orders
+            const todayOrders = orders.filter(o => {
+                const orderDate = new Date(o.date).toDateString();
+                return orderDate === today;
+            });
+            
+            // Find top menu product
+            const itemCounts = {};
+            todayOrders.forEach(order => {
+                order.items?.forEach(item => {
+                    const name = item.menuItem.name;
+                    itemCounts[name] = (itemCounts[name] || 0) + item.quantity;
+                });
+            });
+            
+            const topProduct = Object.keys(itemCounts).length > 0
+                ? Object.keys(itemCounts).reduce((a, b) => itemCounts[a] > itemCounts[b] ? a : b)
+                : 'N/A';
+            
+            // Update UI
+            document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = 
+                `₱${todayRevenue.toFixed(2)}`;
+            document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = 
+                todayOrders.length;
+            document.querySelector('.stat-card:nth-child(3) .stat-label').innerHTML = 
+                topProduct.replace(' ', '<br>');
+        }
+
+        function renderTransactions() {
+            const tableBody = document.querySelector('.transactions-table');
+            const header = tableBody.querySelector('.table-header');
+            
+            // Clear existing rows
+            tableBody.innerHTML = '';
+            tableBody.appendChild(header);
+            
+            // Sort payments by date (most recent first)
+            const sortedPayments = [...payments].sort((a, b) => 
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            
+            sortedPayments.forEach(payment => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <div class="table-cell">#${payment.paymentId}</div>
+                    <div class="table-cell">#${payment.order.orderId}</div>
+                    <div class="table-cell">₱${payment.amount.toFixed(2)}</div>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // ==================== ORDERS ====================
+        function initializeOrderFilters() {
+            const filterBtns = document.querySelectorAll('#orders .filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const status = btn.textContent.trim();
+                    currentOrderFilter = status;
+                    
+                    // Update active button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Filter and render orders
+                    renderOrders();
+                });
+            });
+        }
+
+        async function loadOrders() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/orders`);
+                orders = await response.json();
+                renderOrders();
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showNotification('Failed to load orders', 'error');
+            }
+        }
+
+        function renderOrders() {
+            const ordersGrid = document.querySelector('.orders-grid');
+            ordersGrid.innerHTML = '';
+            
+            // Filter orders
+            const filteredOrders = currentOrderFilter === 'All'
+                ? orders
+                : orders.filter(o => o.status === currentOrderFilter);
+            
+            if (filteredOrders.length === 0) {
+                ordersGrid.innerHTML = '<p style="color: #888; text-align: center; padding: 40px;">No orders found</p>';
+                return;
+            }
+            
+            filteredOrders.forEach(order => {
+                const card = createOrderCard(order);
+                ordersGrid.appendChild(card);
+            });
+        }
+
+        function createOrderCard(order) {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            
+            const itemsList = order.items?.map(item => 
+                `${item.menuItem.name} x${item.quantity}`
+            ).join('<br>') || 'No items';
+            
+            card.innerHTML = `
+                <div class="order-header">
+                    <div class="order-id">#${order.orderId}</div>
+                    <div class="order-status">${order.status}</div>
+                </div>
+                <div class="order-items">${itemsList}</div>
+                <div class="order-total">₱${order.total.toFixed(2)}</div>
+            `;
+            
+            return card;
+        }
+
+        // ==================== MENU ====================
+        function initializeMenuFilters() {
+            const filterBtns = document.querySelectorAll('#menu .filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.textContent.trim();
+                    currentMenuFilter = category;
+                    
+                    // Update active button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Filter and render menu
+                    renderMenuItems();
+                });
+            });
+        }
+
+        function initializeMenuForm() {
+            const imageArea = document.querySelector('.image-upload-area');
+            const addBtn = document.querySelector('.add-btn');
+            
+            // Click to select image
+            imageArea.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => handleImageSelect(e.target.files[0]);
+                input.click();
+            });
+            
+            // Drag and drop
+            imageArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageArea.style.borderColor = '#ff0000';
+            });
+            
+            imageArea.addEventListener('dragleave', () => {
+                imageArea.style.borderColor = 'rgba(139, 0, 0, 0.5)';
+            });
+            
+            imageArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageArea.style.borderColor = 'rgba(139, 0, 0, 0.5)';
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handleImageSelect(file);
+                }
+            });
+            
+            // Add/Save button
+            addBtn.addEventListener('click', handleMenuFormSubmit);
+        }
+
+        function handleImageSelect(file) {
+            selectedImageFile = file;
+            const imageArea = document.querySelector('.image-upload-area');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageArea.innerHTML = `
+                    <img src="${e.target.result}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function handleMenuFormSubmit() {
+            const name = document.getElementById('food-name').value.trim();
+            const price = parseFloat(document.getElementById('price').value);
+            const stock = parseInt(document.getElementById('stock').value);
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value.trim();
+            
+            // Validation
+            if (!name || !price || !stock || !category || !description) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (price <= 0) {
+                showNotification('Price must be greater than 0', 'error');
+                return;
+            }
+            
+            if (stock < 0) {
+                showNotification('Stock cannot be negative', 'error');
+                return;
+            }
+            
+            try {
+                const menuItem = {
+                    name,
+                    price,
+                    stockQuantity: stock,
+                    category,
+                    description
+                };
+                
+                if (editingMenuItem) {
+                    // Update existing item
+                    await updateMenuItem(editingMenuItem.menuItemId, menuItem);
+                } else {
+                    // Create new item
+                    await createMenuItem(menuItem);
+                }
+                
+                // Reset form
+                clearMenuForm();
+                await loadMenuItems();
+                showNotification(editingMenuItem ? 'Menu item updated successfully' : 'Menu item added successfully', 'success');
+            } catch (error) {
+                console.error('Error submitting menu form:', error);
+                showNotification('Failed to save menu item', 'error');
+            }
+        }
+
+        async function createMenuItem(menuItem) {
+            const formData = new FormData();
+            
+            if (selectedImageFile) {
+                formData.append('file', selectedImageFile);
+                formData.append('menuItem', JSON.stringify(menuItem));
+                
+                const response = await fetch(`${API_BASE_URL}/menu/create/with-image/${MANAGER_ID}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Failed to create menu item');
+            } else {
+                const response = await fetch(`${API_BASE_URL}/menu/create/${MANAGER_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(menuItem)
+                });
+                
+                if (!response.ok) throw new Error('Failed to create menu item');
+            }
+        }
+
+        async function updateMenuItem(itemId, menuItem) {
+            const formData = new FormData();
+            
+            if (selectedImageFile) {
+                formData.append('file', selectedImageFile);
+            }
+            formData.append('menuItem', JSON.stringify(menuItem));
+            
+            const response = await fetch(`${API_BASE_URL}/menu/update/with-image/${MANAGER_ID}/${itemId}`, {
+                method: 'PUT',
+                body: formData
+            });
+            
+            if (!response.ok) throw new Error('Failed to update menu item');
+        }
+
+        function clearMenuForm() {
+            document.getElementById('food-name').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('stock').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('description').value = '';
+            
+            selectedImageFile = null;
+            editingMenuItem = null;
+            
+            const imageArea = document.querySelector('.image-upload-area');
+            imageArea.innerHTML = `
+                <div>
+                    <div style="font-size: 3em; margin-bottom: 20px;">📷</div>
+                    <div>Placeholder Picture</div>
+                </div>
+            `;
+            
+            // Reset button
+            const addBtn = document.querySelector('.add-btn');
+            addBtn.textContent = 'Add Item';
+            
+            // Remove cancel button if exists
+            const cancelBtn = document.querySelector('.cancel-btn');
+            if (cancelBtn) cancelBtn.remove();
+        }
+
+        async function loadMenuItems() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/menu`);
+                menuItems = await response.json();
+                renderMenuItems();
+            } catch (error) {
+                console.error('Error loading menu items:', error);
+                showNotification('Failed to load menu items', 'error');
+            }
+        }
+
+        function renderMenuItems() {
+            const menuGrid = document.querySelector('.menu-grid');
+            menuGrid.innerHTML = '';
+            
+            // Filter menu items
+            const filteredItems = currentMenuFilter === 'All'
+                ? menuItems
+                : menuItems.filter(item => item.category === currentMenuFilter);
+            
+            if (filteredItems.length === 0) {
+                menuGrid.innerHTML = '<p style="color: #888; text-align: center; padding: 40px;">No menu items found</p>';
+                return;
+            }
+            
+            filteredItems.forEach(item => {
+                const card = createMenuCard(item);
+                menuGrid.appendChild(card);
+            });
+        }
+
+        function createMenuCard(item) {
+            const card = document.createElement('div');
+            card.className = 'menu-card';
+            
+            const imageSrc = item.imagePath 
+                ? `${API_BASE_URL}/uploads/${item.imagePath}`
+                : 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800';
+            
+            card.innerHTML = `
+                <img class="menu-image" src="${imageSrc}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800'">
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <div class="menu-name">${item.name}</div>
+                        <div class="menu-price">₱${item.price.toFixed(2)}</div>
+                    </div>
+                    <div class="menu-info"><strong>Category:</strong> ${item.category}</div>
+                    <div class="menu-info"><strong>Stock:</strong> ${item.stockQuantity}</div>
+                    <div class="menu-description">${item.description}</div>
+                    <div class="menu-actions">
+                        <button class="action-btn delete-btn" onclick="handleDeleteMenuItem(${item.menuItemId})">Delete</button>
+                        <button class="action-btn" onclick="handleEditMenuItem(${item.menuItemId})">Edit</button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        async function handleDeleteMenuItem(itemId) {
+            if (!confirm('Are you sure you want to delete this menu item?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/menu/delete/${MANAGER_ID}/${itemId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete menu item');
+                
+                await loadMenuItems();
+                showNotification('Menu item deleted successfully', 'success');
+            } catch (error) {
+                console.error('Error deleting menu item:', error);
+                showNotification('Failed to delete menu item', 'error');
+            }
+        }
+
+        function handleEditMenuItem(itemId) {
+            const item = menuItems.find(m => m.menuItemId === itemId);
+            if (!item) return;
+            
+            editingMenuItem = item;
+            
+            // Populate form
+            document.getElementById('food-name').value = item.name;
+            document.getElementById('price').value = item.price;
+            document.getElementById('stock').value = item.stockQuantity;
+            document.getElementById('category').value = item.category;
+            document.getElementById('description').value = item.description;
+            
+            // Update image preview
+            if (item.imagePath) {
+                const imageArea = document.querySelector('.image-upload-area');
+                imageArea.innerHTML = `
+                    <img src="${API_BASE_URL}/uploads/${item.imagePath}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800'">
+                `;
+            }
+            
+            // Change button text
+            const addBtn = document.querySelector('.add-btn');
+            addBtn.textContent = 'Save';
+            
+            // Add cancel button if not exists
+            if (!document.querySelector('.cancel-btn')) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'add-btn cancel-btn';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.style.background = 'linear-gradient(135deg, #666, #888)';
+                cancelBtn.onclick = clearMenuForm;
+                addBtn.parentNode.appendChild(cancelBtn);
+            }
+            
+            // Scroll to form
+            document.querySelector('.menu-form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== PAYMENTS ====================
+        async function loadPayments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/payments`);
+                payments = await response.json();
+            } catch (error) {
+                console.error('Error loading payments:', error);
+            }
+        }
+
+        // ==================== LOGOUT ====================
+        function initializeLogout() {
+            const logoutBtn = document.querySelector('.logout-btn');
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    window.location.href = 'LoginPage.html'; // Adjust to your login page
+                }
+            });
+        }
+
+        // ==================== UTILITIES ====================
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Make functions globally accessible
+        window.handleDeleteMenuItem = handleDeleteMenuItem;
+        window.handleEditMenuItem = handleEditMenuItem;
+    </script>
+</body>
+</html>
